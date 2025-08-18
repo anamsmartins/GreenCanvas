@@ -1,0 +1,6 @@
+{
+  "python.analysis.diagnosticSeverityOverrides": {
+    "reportInvalidTypeForm": "none"
+  },
+  "python.analysis.extraPaths": ["./modules"]
+}
