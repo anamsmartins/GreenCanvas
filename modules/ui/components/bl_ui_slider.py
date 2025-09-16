@@ -268,6 +268,9 @@ class BL_UI_Slider(BL_UI_Widget):
  
     def set_value_change(self, value_change_func):
         self.value_change_func = value_change_func
+
+    def set_on_mouse_down_popup(self, on_mouse_down_popup):
+        self.on_mouse_down_popup = on_mouse_down_popup
     
     def is_in_rect(self, x, y):
         area_height = self.get_area_height()
@@ -334,10 +337,17 @@ class BL_UI_Slider(BL_UI_Widget):
             except:
                 pass
                  
-    def mouse_down(self, x, y):    
+    def mouse_down(self, x, y):
         self.update_x_offset()
 
         if self._is_visible and self.is_widget_active and self.is_in_rect(x,y):
+            try:
+                is_valid = self.on_mouse_down_popup()
+                if not is_valid:
+                    return
+            except:
+                pass
+
             self.__state = 1
             self.__is_drag = True
                 

@@ -6,22 +6,9 @@ from .ui.canvas.bl_ui_leaf_panel_canvas import *
 from .ui.panels.bl_ui_static_panel import *
 from .ui.components.bl_ui_button import *
 
-from .properties import GC_PG_Stroke
+from .bl_panel_active_tool import is_branch_panel_inactive
 
-from .bl_panels_op import is_branch_panel_inactive
-
-PANEL_BOUNDS = {"x": 20, "y": 160, "width": 160, "height": 65}
-
-class GC_PG_leaf_curvature_type_canvas_settings(bpy.types.PropertyGroup):
-    stroke: bpy.props.PointerProperty(type=GC_PG_Stroke)
-    x_norm_factor: bpy.props.FloatProperty(
-        name="X Normalize Factor",
-        default=0.0
-    )
-    y_norm_factor: bpy.props.FloatProperty(
-        name="Y Normalize Factor",
-        default=0.0
-    )
+PANEL_BOUNDS = {"x": 20, "y": 172, "width": 160, "height": 65}
 
 class DP_OT_draw_leaf_curvature_type_canvas_operator(BL_UI_OT_draw_operator):
     bl_idname = "view3d.dp_ot_draw_leaf_curvature_type_canvas_operator"
@@ -69,47 +56,17 @@ class DP_OT_draw_leaf_curvature_type_canvas_operator(BL_UI_OT_draw_operator):
         self.init_widgets(context, widgets)
 
         self.panel.add_widgets(widgets_panel)
-
-class GC_OT_no_leaf_curvature_type_popup(bpy.types.Operator):
-    bl_idname = "gc.no_leaf_curvature_type_popup"
-    bl_label = "Missing Leaf Curvature Type"
-    bl_description = "You need to draw a leaf curvature type before drawing leaves."
-
-    def draw(self, context):
-        layout = self.layout
-        layout.label(text="You need to draw a leaf curvature type before drawing leaves.")
-
-    def execute(self, context):
-        return {'FINISHED'}
-
-    def invoke(self, context, event):
-        return context.window_manager.invoke_props_dialog(self)
-    
-class GC_OT_no_branches_popup(bpy.types.Operator):
-    bl_idname = "gc.no_branches_popup"
-    bl_label = "Missing Branches"
-    bl_description = "You need to draw at least one branch before drawing leaves."
-
-    def draw(self, context):
-        layout = self.layout
-        layout.label(text="You need to draw at least one branch before drawing leaves.")
-
-    def execute(self, context):
-        return {'FINISHED'}
-
-    def invoke(self, context, event):
-        return context.window_manager.invoke_props_dialog(self)
         
+classes = (
+    DP_OT_draw_leaf_curvature_type_canvas_operator,
+)
+
 def register():
-    bpy.utils.register_class(DP_OT_draw_leaf_curvature_type_canvas_operator)
-    bpy.utils.register_class(GC_OT_no_leaf_curvature_type_popup)
-    bpy.utils.register_class(GC_OT_no_branches_popup)
-    bpy.utils.register_class(GC_PG_leaf_curvature_type_canvas_settings)
-    bpy.types.Scene.leaf_curvature_type_canvas_settings = bpy.props.PointerProperty(type=GC_PG_leaf_curvature_type_canvas_settings)
+    for cls in classes:
+        if not hasattr(bpy.types, cls.__name__):
+            bpy.utils.register_class(cls)
 
 def unregister():  
-    del bpy.types.Scene.leaf_curvature_type_canvas_settings
-    bpy.utils.unregister_class(DP_OT_draw_leaf_curvature_type_canvas_operator)
-    bpy.utils.unregister_class(GC_OT_no_leaf_curvature_type_popup)
-    bpy.utils.unregister_class(GC_OT_no_branches_popup)
-    bpy.utils.unregister_class(GC_PG_leaf_curvature_type_canvas_settings)
+    for cls in reversed(classes):
+        if hasattr(bpy.types, cls.__name__):
+            bpy.utils.unregister_class(cls)

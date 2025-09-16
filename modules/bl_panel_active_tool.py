@@ -2,7 +2,6 @@ import bpy
 import time
 
 # --- Property Groups ---
-branch_panel_active = False
 
 def set_branch_panel_active(value):
     global branch_panel_active
@@ -19,15 +18,6 @@ def is_branch_panel_inactive():
 def is_tool_panel_active():
     global draw_active
     return draw_active
-
-class GC_PG_panel_settings(bpy.types.PropertyGroup):
-    active_tool: bpy.props.EnumProperty(
-        name="Active Tool",
-        items=[('BRANCH', "Branch", "Switch to Branch Tool"), # (identifier, name, description)
-               ('LEAF', "Leaf", "Switch to Leaf Tool"),
-               ('START', "Start Drawing", "Setup menus and canvas to start drawing")],
-        default="START",
-    )
 
 # --- Functions ---
 
@@ -50,9 +40,8 @@ def draw_tool_header(layout, pcoll_icons, active_tool):
     
     row_left.operator("view3d.gc_ot_set_active_tool_branch_operator", icon_value=branch_icon_id, text="", emboss=False)
     row_left.operator("view3d.gc_ot_set_active_tool_leaf_operator", icon_value=leaf_icon_id, text="", emboss=False)
-
+   
     # -- Undo/Clear buttons -- 
-
     col_right = split.column()
     row_right = col_right.row(align=True)
     row_right.alignment = 'RIGHT'
@@ -62,14 +51,16 @@ def draw_tool_header(layout, pcoll_icons, active_tool):
     row_right.operator("view3d.gc_ot_main_canvas_undo", icon_value=pcoll_icons["undo-icon"].icon_id, text="", emboss=False)
     row_right.operator("view3d.gc_ot_main_canvas_clear", icon_value=pcoll_icons["clear-icon"].icon_id, text="", emboss=False)
 
+    layout.separator()
 
-def draw_tool_START(layout, pcoll_icons):
-    layout.operator("view3d.gc_ot_start_drawing_operator", text="Start Drawing")
 
-def draw_tool_BRANCH(layout, pcoll_icons):
+def draw_tool_START(layout):
+    layout.operator("view3d.gc_ot_start_drawing_operator", text="Start Drawing", icon="GREASEPENCIL")
+
+def draw_tool_BRANCH(layout):
 
     row = layout.row()
-    row.label(text= f"Brush Size:")
+    row.label(text= f"Brush Size:", icon="BRUSHES_ALL")
 
     # BL_UI_Slider
     layout.separator()
@@ -77,7 +68,7 @@ def draw_tool_BRANCH(layout, pcoll_icons):
     layout.separator()
 
     row = layout.row()
-    row.label(text= "Branch Shape:")
+    row.label(text= "Branch Shape:", icon="SHARPCURVE")
 
     # Branch Shape Canvas
     layout.separator()
@@ -89,9 +80,9 @@ def draw_tool_BRANCH(layout, pcoll_icons):
     layout.separator()
 
 
-def draw_tool_LEAF(layout, pcoll_icons):
+def draw_tool_LEAF(layout):
 
-    layout.label(text= "Curvature Type:")
+    layout.label(text= "Curvature Type:", icon="FORCE_HARMONIC")
 
     # Leaf Curvature Type Canvas
     layout.separator()
@@ -103,28 +94,13 @@ def draw_tool_LEAF(layout, pcoll_icons):
     layout.separator()
 
 
-
 # --- Operators ---
-
-class GC_OT_start_drawing_operator(bpy.types.Operator):
-    bl_idname = "view3d.gc_ot_start_drawing_operator"
-    bl_label = "Start Drawing"
-    bl_description = "Starts the drawing process"
-
-    def execute(self, context):
-        context.scene.panel_settings.active_tool = "BRANCH"
-        set_branch_panel_active(True)
-        bpy.ops.view3d.dp_ot_draw_main_canvas_operator('INVOKE_DEFAULT') # open main drawing canvas
-        bpy.ops.view3d.dp_ot_draw_branch_slider_operator('INVOKE_DEFAULT') # open branch slider
-        bpy.ops.view3d.dp_ot_draw_branch_shape_canvas_operator('INVOKE_DEFAULT') # open branch shape canvas
-        bpy.ops.view3d.dp_ot_draw_leaf_curvature_type_canvas_operator('INVOKE_DEFAULT') # open leaf curvature type canvas
-
-        return {'FINISHED'}
 
 class GC_OT_set_active_tool_branch_operator(bpy.types.Operator):
     bl_idname = "view3d.gc_ot_set_active_tool_branch_operator"
     bl_label = "Set Branch Active Tool"
     bl_description = "Sets the Branch as the active tool"
+    bl_options = {'REGISTER'}
 
     def execute(self, context):
         context.scene.panel_settings.active_tool = "BRANCH"
@@ -135,6 +111,7 @@ class GC_OT_set_active_tool_leaf_operator(bpy.types.Operator):
     bl_idname = "view3d.gc_ot_set_active_tool_leaf_operator"
     bl_label = "Set Leaf Active Tool"
     bl_description = "Sets the Leaf as the active tool"
+    bl_options = {'REGISTER'}
 
     def execute(self, context):
         context.scene.panel_settings.active_tool = "LEAF"
@@ -158,12 +135,22 @@ def check_active_tool_panel_status():
 
 class GC_PT_active_tool_panel(bpy.types.Panel):
     bl_idname = "GC_PT_active_tool_panel"
-    bl_label = "Active Tool Panel"
+    bl_label = "Active Tool"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
     bl_category = "GreenCanvas"
 
+    @classmethod
+    def poll(cls, context):
+        return bpy.context.scene.started_drawing and not bpy.context.scene.built_plant
+
     def draw(self, context):
+        started_drawing = bpy.context.scene.started_drawing
+        built_plant = bpy.context.scene.built_plant
+
+        if (not started_drawing) or (built_plant):
+            return
+
         global last_draw_time, draw_active
         last_draw_time = time.time()
         draw_active = True
@@ -175,67 +162,34 @@ class GC_PT_active_tool_panel(bpy.types.Panel):
         active_tool = settings.active_tool
         pcoll_icons = context.scene.preview_collections["main"]
 
-        if (active_tool != "START"):
-            draw_tool_header(layout, pcoll_icons, active_tool)
+        draw_tool_header(layout, pcoll_icons, active_tool)
 
         draw_func = globals().get(f'draw_tool_{active_tool}')
-        draw_func(layout, pcoll_icons)
-
-        
-class GC_PT_actions_panel(bpy.types.Panel):
-    bl_idname = "GC_PT_actions_panel"
-    bl_label = "Actions Panel"
-    bl_space_type = "VIEW_3D"
-    bl_region_type = "UI"
-    bl_category = "GreenCanvas"
-
-    def draw(self, context):
-        settings = context.scene.panel_settings
-        active_tool = settings.active_tool
-
-        layout = self.layout
-        layout.scale_y = 1.4
-        
-        if (active_tool != "START"):
-            row = layout.row()
-            row.operator("mesh.primitive_uv_sphere_add", text="Build Plant")
-
-class GC_PT_info_panel(bpy.types.Panel):
-    bl_idname = "GC_PT_info_panel"
-    bl_label = "Information Panel"
-    bl_space_type = "VIEW_3D"
-    bl_region_type = "UI"
-    bl_category = "GreenCanvas"
-
-    def draw(self, context):
-        layout = self.layout
-        layout.scale_y = 1.4
-
-        row = layout.row()
-        row.operator("mesh.primitive_uv_sphere_add", text="i")
-        row.operator("mesh.primitive_uv_sphere_add", text="video")
+        draw_func(layout)
 
 # --- Register & Unregister ---
 
 classes = (
-    GC_PG_panel_settings, 
     GC_PT_active_tool_panel, 
-    GC_PT_actions_panel, 
-    GC_PT_info_panel, 
     GC_OT_set_active_tool_branch_operator,
     GC_OT_set_active_tool_leaf_operator,
-    GC_OT_start_drawing_operator,
 )
 
 def register():
     for cls in classes:
-        bpy.utils.register_class(cls)
-    bpy.types.Scene.panel_settings = bpy.props.PointerProperty(type=GC_PG_panel_settings)
-    bpy.app.timers.register(check_active_tool_panel_status, persistent=True)
-    
+        if not hasattr(bpy.types, cls.__name__):
+            bpy.utils.register_class(cls)
+    try:
+        bpy.app.timers.register(check_active_tool_panel_status, persistent=True)
+    except ValueError:
+        pass
 
 def unregister():    
-    del bpy.types.Scene.panel_settings
-    bpy.app.timers.unregister(check_active_tool_panel_status)
     for cls in reversed(classes):
-        bpy.utils.unregister_class(cls)
+        if hasattr(bpy.types, cls.__name__):
+            bpy.utils.unregister_class(cls)
+
+    try:
+        bpy.app.timers.unregister(check_active_tool_panel_status)
+    except ValueError:
+        pass

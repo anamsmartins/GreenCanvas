@@ -4,7 +4,6 @@ class BL_UI_Panel_Canvas(BL_UI_Widget):
     def __init__(self, x, y, width, height):
         super().__init__(x, y, width, height)
         self._brush_color = (1, 1, 1, 1)
-        self._brush_size = 3
         self.is_drawing = False
 
     @property

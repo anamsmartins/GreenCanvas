@@ -17,6 +17,12 @@ class DP_OT_draw_main_canvas_operator(BL_UI_OT_draw_operator):
     bl_description = "Main drawing canvas operator, where the user draws the plant sketch (branches & leaves)" 
     bl_options = {'REGISTER'}
 
+    # Draw handler to paint onto the screen
+    def draw_callback_px(self, op, context):
+        if bpy.context.scene.main_canvas_visible:
+            for widget in self.widgets:
+                widget.draw()
+
     def on_invoke(self, context, event):
 
         self.panel = BL_UI_Drag_Panel(PANEL_BOUNDS["x"], PANEL_BOUNDS["y"], PANEL_BOUNDS["width"], PANEL_BOUNDS["height"])
@@ -45,7 +51,7 @@ class DP_OT_draw_main_canvas_operator(BL_UI_OT_draw_operator):
 
 class GC_OT_main_canvas_undo(bpy.types.Operator):
     bl_idname = "view3d.gc_ot_main_canvas_undo"
-    bl_label = "Undo Main Canvas Stroke"
+    bl_label = "Undo Main Canvas Stroke ( Ctrl + U )"
     bl_description = "Undo last stroke of the active tool in the main canvas"
 
     def execute(self, context):
@@ -69,14 +75,34 @@ class GC_OT_main_canvas_clear(bpy.types.Operator):
     
     def invoke(self, context, event):
         return context.window_manager.invoke_confirm(self, event)
+    
+class GC_OT_main_canvas_hide_show(bpy.types.Operator):
+    bl_idname = "view3d.gc_ot_main_canvas_hide_show"
+    bl_label = "Hides or Shows main canvas"
+    bl_description = "Hides or Shows the main drawing canvas"
+
+    def execute(self, context):
+        bpy.context.scene.main_canvas_visible = not bpy.context.scene.main_canvas_visible 
+        global main_canvas
+        if main_canvas:
+            main_canvas._is_visible = not main_canvas._is_visible
+
+        return {'FINISHED'}
+    
         
+classes = (
+    DP_OT_draw_main_canvas_operator,
+    GC_OT_main_canvas_undo,
+    GC_OT_main_canvas_clear,
+    GC_OT_main_canvas_hide_show,
+)
         
 def register():
-    bpy.utils.register_class(DP_OT_draw_main_canvas_operator)
-    bpy.utils.register_class(GC_OT_main_canvas_undo)
-    bpy.utils.register_class(GC_OT_main_canvas_clear)
+    for cls in classes:
+        if not hasattr(bpy.types, cls.__name__):
+            bpy.utils.register_class(cls)
 
 def unregister():  
-    bpy.utils.unregister_class(DP_OT_draw_main_canvas_operator)
-    bpy.utils.unregister_class(GC_OT_main_canvas_undo)
-    bpy.utils.unregister_class(GC_OT_main_canvas_clear)
+    for cls in reversed(classes):
+        if hasattr(bpy.types, cls.__name__):
+            bpy.utils.unregister_class(cls)

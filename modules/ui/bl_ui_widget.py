@@ -250,7 +250,7 @@ class BL_UI_Widget:
         elif event.value == 'PRESS' and (event.ascii != '' or event.type in self.get_input_keys()):
             return self.text_input(event)
                         
-        elif event.type == 'Z' and event.value == 'PRESS' and event.ctrl:
+        elif event.type == 'U' and event.value == 'PRESS' and event.ctrl:
             return self.undo()
         
         elif event.type == 'Y' and event.value == 'PRESS' and event.ctrl:

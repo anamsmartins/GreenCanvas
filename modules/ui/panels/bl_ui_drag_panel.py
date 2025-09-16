@@ -1,5 +1,6 @@
 from ..bl_ui_widget import BL_UI_Widget
 from .bl_ui_drag_header import BL_UI_Drag_Header
+from ..components.bl_ui_image import BL_UI_Image
 
 class BL_UI_Drag_Panel(BL_UI_Widget):
     
@@ -14,6 +15,9 @@ class BL_UI_Drag_Panel(BL_UI_Widget):
     def set_location(self, x, y):
         super().set_location(x,y)
         self.layout_widgets()
+    
+    def set_hide_panel(self, hide_panel_func):
+        self.hide_panel_func = hide_panel_func
 
     def add_widget(self, widget):
         self.widgets.append(widget)
@@ -39,6 +43,8 @@ class BL_UI_Drag_Panel(BL_UI_Widget):
                         self.is_drag = True
                         self.drag_offset_x = x - self.x_screen
                         self.drag_offset_y = y - (height - self.y_screen)
+                elif isinstance(widget, BL_UI_Image):
+                    return False
                 return True       
         return False
     
@@ -55,8 +61,10 @@ class BL_UI_Drag_Panel(BL_UI_Widget):
                 self.drag_offset_y = y - (height - self.y_screen)
                 
             return True
-        
-        return False
+        try:
+            self.hide_panel_func()
+        except:
+            return False
 
     def mouse_move(self, x, y):
         if self.is_drag:

@@ -64,8 +64,8 @@ class BL_UI_Button(BL_UI_Widget):
     def select_bg_color(self, value):
         self._select_bg_color = value 
         
-    def set_image_size(self, imgage_size):
-        self.__image_size = imgage_size
+    def set_image_size(self, image_size):
+        self.__image_size = image_size
         self.base_image_size = self.__image_size[0]
 
     def set_image_position(self, image_position):

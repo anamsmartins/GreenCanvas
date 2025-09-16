@@ -6,22 +6,9 @@ from .ui.canvas.bl_ui_branch_panel_canvas import *
 from .ui.panels.bl_ui_static_panel import *
 from .ui.components.bl_ui_button import *
 
-from .properties import GC_PG_Stroke
+from .bl_panel_active_tool import is_branch_panel_active
 
-from .bl_panels_op import is_branch_panel_active
-
-PANEL_BOUNDS = {"x": 20, "y": 230, "width": 160, "height": 65}
-
-class GC_PG_branch_shape_canvas_settings(bpy.types.PropertyGroup):
-    strokes: bpy.props.CollectionProperty(type=GC_PG_Stroke)
-    x_norm_factor: bpy.props.FloatProperty(
-        name="X Normalize Factor",
-        default=0.0
-    )
-    y_norm_factor: bpy.props.FloatProperty(
-        name="Y Normalize Factor",
-        default=0.0
-    )
+PANEL_BOUNDS = {"x": 20, "y": 245, "width": 160, "height": 65}
 
 class DP_OT_draw_branch_shape_canvas_operator(BL_UI_OT_draw_operator):
     bl_idname = "view3d.dp_ot_draw_branch_shape_canvas_operator"
@@ -69,30 +56,17 @@ class DP_OT_draw_branch_shape_canvas_operator(BL_UI_OT_draw_operator):
         self.init_widgets(context, widgets)
 
         self.panel.add_widgets(widgets_panel)
-
-class GC_OT_incomplete_branch_shape_popup(bpy.types.Operator):
-    bl_idname = "gc.incomplete_branch_shape"
-    bl_label = "Incomplete Branch Shape"
-    bl_description = "You've started a branch shape, but it's incomplete. Complete it with a second stroke or remove it."
-
-    def draw(self, context):
-        layout = self.layout
-        layout.label(text="You've started a branch shape, but it's incomplete. Complete it with a second stroke or remove it.")
-
-    def execute(self, context):
-        return {'FINISHED'}
-
-    def invoke(self, context, event):
-        return context.window_manager.invoke_props_dialog(self)
         
-def register():
-    bpy.utils.register_class(DP_OT_draw_branch_shape_canvas_operator)
-    bpy.utils.register_class(GC_PG_branch_shape_canvas_settings)
-    bpy.utils.register_class(GC_OT_incomplete_branch_shape_popup)
-    bpy.types.Scene.branch_shape_canvas_settings = bpy.props.PointerProperty(type=GC_PG_branch_shape_canvas_settings)
+classes = (
+    DP_OT_draw_branch_shape_canvas_operator,
+)
 
+def register():
+    for cls in classes:
+        if not hasattr(bpy.types, cls.__name__):
+            bpy.utils.register_class(cls)
+   
 def unregister():  
-    del bpy.types.Scene.branch_shape_canvas_settings
-    bpy.utils.unregister_class(DP_OT_draw_branch_shape_canvas_operator)
-    bpy.utils.unregister_class(GC_PG_branch_shape_canvas_settings)
-    bpy.utils.unregister_class(GC_OT_incomplete_branch_shape_popup)
+    for cls in reversed(classes):
+        if hasattr(bpy.types, cls.__name__):
+            bpy.utils.unregister_class(cls)

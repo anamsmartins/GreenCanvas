@@ -8,6 +8,8 @@ class BL_UI_OT_draw_operator(Operator):
     bl_description = "Operator for bl ui widgets" 
     bl_options = {'REGISTER'}
     	
+    finish_callback = None
+
     @property
     def region_type(self):
         return self._region_type
@@ -43,6 +45,8 @@ class BL_UI_OT_draw_operator(Operator):
                    
         context.window_manager.modal_handler_add(self)
 
+        context.scene.draw_operators.append(self)
+
         return {"RUNNING_MODAL"}
     
     def register_handlers(self, args, context):
@@ -50,10 +54,13 @@ class BL_UI_OT_draw_operator(Operator):
         self.draw_event = context.window_manager.event_timer_add(0.1, window=context.window)
         
     def unregister_handlers(self, context):
+        if self.draw_event is not None:
+            context.window_manager.event_timer_remove(self.draw_event)
+            self.draw_event = None
         
-        context.window_manager.event_timer_remove(self.draw_event)
-        
-        bpy.types.SpaceView3D.draw_handler_remove(self.draw_handle, self.region_type)
+        if self.draw_handle is not None:
+            bpy.types.SpaceView3D.draw_handler_remove(self.draw_handle, self.region_type)
+            self.draw_handle = None
         
         self.draw_handle = None
         self.draw_event  = None
