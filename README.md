@@ -18,7 +18,11 @@ Backed by a systematic review of plant modelling techniques, the addon emphasize
 
 ## 🎥 Video
 
-_
+https://github.com/user-attachments/assets/b30b38af-6766-4238-9c02-72395107cdd8
+
+- Voice: [Eleven labs](https://elevenlabs.io/)
+- Music and extra audio effects: [Pixabay](pixabay.com/music/search/)
+- Initial Videos: [Pixabay](https://pixabay.com/videos/)
 
 ## 🌱 Usage
 
