@@ -49,37 +49,22 @@ def point_at_offset(chain_world, offset):
         acc += seg_len
     return chain_world[-1]
 
-def positions_on_branch(branch_chain_world, branch_length, number_leaves, mode="random", start_offset=0):
+def positions_on_branch(branch_chain_world, usable_length, number_leaves, mode="random", start_offset=0):
     positions = []
 
     if mode == "even":
-        # Compute offsets
-        offsets_space = branch_length / (number_leaves - 1)
-        positions_offsets = []
-        current_pos_offset = start_offset
-        while current_pos_offset <= branch_length + start_offset:
-            positions_offsets.append(current_pos_offset)
-            current_pos_offset += offsets_space
-        
-        for n in range(number_leaves - 1):
-            # Get offset
-            offset = positions_offsets[n]
-
-            # Find which segment contains the target offset
-            new_pos = point_at_offset(branch_chain_world, offset)
-            positions.append(new_pos)
+        offsets_space = usable_length / (number_leaves - 1)
+        positions_offsets = [
+            start_offset + i * offsets_space for i in range(number_leaves)
+        ]
+        positions = [point_at_offset(branch_chain_world, offset) for offset in positions_offsets]
 
     elif mode == "random":
         min_offset = start_offset
-        max_offset = branch_length + start_offset
-
+        max_offset = start_offset + usable_length
         for _ in range(number_leaves):
-            # Get random offset
             offset = random.uniform(min_offset, max_offset)
-
-            # Find which segment contains the target offset
-            new_pos = point_at_offset(branch_chain_world, offset)
-            positions.append(new_pos)
+            positions.append(point_at_offset(branch_chain_world, offset))
 
     return positions
 
@@ -144,35 +129,32 @@ class GC_OT_propagate_leaves_operator(bpy.types.Operator):
             return {'CANCELLED'}
 
         # Compute number and positions of the new leaves
-        realistic = bpy.context.scene.propagate_leaves_selector == "REAL"
 
         branch_chain = find_edge_chain(branch_obj)
         branch_chain_world = [branch_obj.matrix_world @ v for v in branch_chain]
         branch_length = get_branch_length(branch_chain_world)
+
         branch_start_offset = 0.2 * branch_length
         branch_end_offset = 0.05 * branch_length
-        branch_length -= branch_start_offset - branch_end_offset
-        
-        if realistic:
-            parent_obj = branch_obj.parent
-            
-            # If parent and collection
-            if parent_obj.data is None:
-                parent_length = branch_length
-                branch_offset = 0
-            else:
-                parent_chain = find_edge_chain(branch_obj)
-                parent_chain_world = [parent_obj.matrix_world @ v for v in parent_chain]
-                parent_length = get_branch_length(parent_chain_world)
+        usable_length = branch_length - (branch_start_offset + branch_end_offset)
 
-                branch_pos_world = branch_obj.matrix_world.translation
-                branch_offset = get_offset_along_branch(parent_chain_world, branch_pos_world, parent_length)
+        realistic = bpy.context.scene.propagate_leaves_selector == "REAL"
+        mode = "even" if realistic else "random"
 
-            num_new_leaves = compute_number_of_leaves(branch_offset, parent_length)
-            new_leaves_positions = positions_on_branch(branch_chain_world, branch_length, num_new_leaves, "even", start_offset=branch_start_offset)
-        else:
-            num_new_leaves = random.randint(8, 16)
-            new_leaves_positions = positions_on_branch(branch_chain_world, branch_length, num_new_leaves, "random", start_offset=branch_start_offset)
+        number_leaves = self.compute_number_leaves(branch_obj, usable_length, realistic)
+
+        if mode == "even":
+            offsets_space = usable_length / (number_leaves - 1)
+            positions_offsets = [branch_start_offset + i * offsets_space for i in range(number_leaves)]
+            positions = [point_at_offset(branch_chain_world, offset) for offset in positions_offsets]
+
+        elif mode == "random":
+            positions = []
+            for _ in range(number_leaves):
+                offset = random.uniform(branch_start_offset, branch_start_offset + usable_length)
+                positions.append(point_at_offset(branch_chain_world, offset))
+
+        new_leaves_positions = positions_on_branch(branch_chain_world, usable_length, number_leaves, mode, start_offset=branch_start_offset)
 
         for idx, new_leaf_pos in enumerate(new_leaves_positions):
             # Random mesh from existing leaves on the branch
@@ -220,6 +202,30 @@ class GC_OT_propagate_leaves_operator(bpy.types.Operator):
             new_leaf.matrix_world.translation = new_leaf_pos
 
         return {'FINISHED'}
+    
+    def compute_number_leaves(self, branch_obj, branch_length, realistic):
+        if not realistic:
+            return random.randint(8, 16)
+
+        parent_obj = branch_obj.parent
+        
+        # If parent and collection
+        if "trunk" in branch_obj.name.lower():
+            parent_length = branch_length
+            branch_offset = 0
+        else:
+            if "main" in branch_obj.name.lower():
+                parent_obj = next((c for c in parent_obj.children if c.name.startswith("Trunk")), None)
+        
+            parent_chain = find_edge_chain(parent_obj)
+            parent_chain_world = [parent_obj.matrix_world @ v for v in parent_chain]
+            parent_length = get_branch_length(parent_chain_world)
+
+            branch_pos_world = branch_obj.matrix_world.translation
+            branch_offset = get_offset_along_branch(parent_chain_world, branch_pos_world, parent_length)
+
+        return compute_number_of_leaves(branch_offset, parent_length)
+
 
 classes = (
     GC_OT_propagate_leaves_operator,

@@ -4,7 +4,6 @@ import numpy as np
 from mathutils import Vector
 
 def catmull_rom_spline(P0, P1, P2, P3, nPoints=20):
-    """Generates points between P1 and P2 using Catmull–Rom Spline (NumPy optimized)."""
     alpha = 0.5
     P0, P1, P2, P3 = map(np.array, (P0, P1, P2, P3))
 

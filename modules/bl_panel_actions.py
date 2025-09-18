@@ -81,8 +81,8 @@ class GC_OT_start_drawing_additional_operator(bpy.types.Operator):
         context.scene.panel_settings.active_tool = "BRANCH"
 
         bpy.context.scene.built_plant = False
-        # bl_panel_active_tool_register()
         set_branch_panel_active(True)
+
         bpy.ops.view3d.dp_ot_draw_main_canvas_operator('INVOKE_DEFAULT') # open main drawing canvas
         bpy.ops.view3d.dp_ot_draw_branch_slider_operator('INVOKE_DEFAULT') # open branch slider
         bpy.ops.view3d.dp_ot_draw_branch_shape_canvas_operator('INVOKE_DEFAULT') # open branch shape canvas

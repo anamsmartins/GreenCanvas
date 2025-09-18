@@ -30,8 +30,6 @@ class BL_UI_Leaf_Panel_Canvas(BL_UI_Panel_Canvas):
         if self.is_widget_active and self.is_drawing:
             self.is_drawing = False
 
-            self.curvature_type.append((x - self.x_offset, y))
-
             # save to scene
             x_norm_factor = self.x_screen 
             y_norm_factor = self.get_area_height() - self.y_screen - self.height

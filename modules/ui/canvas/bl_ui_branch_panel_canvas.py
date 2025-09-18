@@ -33,9 +33,15 @@ class BL_UI_Branch_Panel_Canvas(BL_UI_Panel_Canvas):
         if self.is_drawing:
             self.is_drawing = False
             
-            if len(self.branches) > 1:
+            if len(self.branches) == 0:
+                return
 
-                existing_branch_points = self.branches[0]
+            existing_branch_points = self.branches[0]
+            branch_shape_canvas_settings = bpy.context.scene.branch_shape_canvas_settings
+
+            if len(self.branches) < 2:
+                branch_shape_canvas_settings.left_stroke.add()    
+            else:
                 new_branch_points = self.branches[-1]
                 existing_branch_ends = [existing_branch_points[0], existing_branch_points[-1]]
             
@@ -66,12 +72,12 @@ class BL_UI_Branch_Panel_Canvas(BL_UI_Panel_Canvas):
                 new_left_branch = [(x - dx, y - dy) for (x, y) in left_branch]
                 new_right_branch = [(x - dx, y - dy) for (x, y) in right_branch]
 
-                # normalize so first point of first stroke is (0,0) and store in scene variable
-                branch_shape_canvas_settings = bpy.context.scene.branch_shape_canvas_settings
-
+                # Adjust shape size to match main canvas
                 canvas_width, canvas_height = 160, 65
                 target_width, target_height = 700, 700
-
+                
+                branch_shape_canvas_settings.left_stroke.clear()
+                
                 for point in new_left_branch:
                     new_point = branch_shape_canvas_settings.left_stroke.add()
                     new_point.x = point[0]  / canvas_width * target_width
@@ -104,8 +110,8 @@ class BL_UI_Branch_Panel_Canvas(BL_UI_Panel_Canvas):
         if abs(diff_y) > abs(diff_x):
             def swap_xy(stroke):
                 return [(p[1], p[0]) for p in stroke]
-            base_branch_A = swap_xy(base_branch_A)
-            base_branch_B = swap_xy(base_branch_B)
+            base_branch_A = swap_xy(branch_A)
+            base_branch_B = swap_xy(branch_B)
             branch_shape_tip = (branch_shape_tip[1], branch_shape_tip[0])
 
         base_branch_A, base_branch_B = np.array(branch_A[0], float), np.array(branch_B[0], float)

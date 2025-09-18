@@ -9,12 +9,10 @@ bl_info = {
     "category": "GreenCanvas",
 }
 
-# REMOVE WHEN DEPLOY
-import site
-site.addsitedir("/home/uwuntu/.local/lib/python3.10/site-packages")
+# Comment when buidling zip
+# import site
+# site.addsitedir("/home/uwuntu/.local/lib/python3.10/site-packages")
 
-import logging
-import os
 import bpy
 from bpy.props import *
 
@@ -38,21 +36,7 @@ from .modules.dp_building_plant_op import register as dp_building_plant_op_regis
 
 preview_collections = {} # Icons 
 
-# Logging setup
-def setup_logging():
-    log_file = os.path.join(os.path.dirname(__file__), "log.txt")
-    logging.basicConfig(
-        filename=log_file,
-        level=logging.DEBUG,
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-    )
-    logging.getLogger().setLevel(logging.DEBUG)
-    logging.info("Logging initialized") # print("cat") == logging.info("Cat")
-    bpy.app.debug_wm  = True
-
 def register():
-    #setup_logging()
-
     # Icons
     preview_collections["main"] = load_icons()
     bpy.types.Scene.preview_collections = preview_collections
@@ -116,8 +100,9 @@ def unregister():
     dp_instructions_video_op_unregister()
     bl_panel_info_unregister()
 
-# if __name__ == "__main__":
-#     register()
+# Uncomment when building zip
+if __name__ == "__main__":
+    register()
 
-# REMOVE WHEN DEPLOY
-register()
+# Comment when buidling zip
+# register()

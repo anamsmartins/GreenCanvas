@@ -284,7 +284,7 @@ def project_leaf(leaf, name="Leaf"):
         v_left = outline1[i]
         v_right = outline2[i]
         v_mid = inner[i]
-        depth = depths[i]
+        depth = max(depths[i], 0.01)
 
         for j in range(rows):
             t = j / (rows - 1)
@@ -358,7 +358,6 @@ def to_vectors(points):
     return [Vector((pt.x, pt.y, pt.z)) for pt in points]
 
 def resample_points(points, target_count):
-    """Resample a polyline to exactly target_count points."""
     if len(points) == 0:
         return []
     if len(points) == 1:

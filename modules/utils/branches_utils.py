@@ -54,7 +54,7 @@ def get_branch_mesh_name(branch, parent, parent_prefix, branch_type_counter):
     if branch_type == "trunk":
         return "Trunk", ""
 
-    if branch_type == "main" and parent.name == "Branches":
+    if branch_type == "main" and "Branches" in parent.name:
         name = f"Main {num}"
         prefix = f"M{num}"
         return name, prefix

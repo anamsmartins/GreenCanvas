@@ -69,15 +69,15 @@ class BL_UI_Main_Canvas(BL_UI_Widget):
                 return
             
             active_tool = bpy.context.scene.panel_settings.active_tool
+            bshape_canvas_settings = bpy.context.scene.branch_shape_canvas_settings
 
-            # TODO - fix popup logic
-            # if active_tool == 'BRANCH' and len(bpy.context.scene.branch_shape_canvas_settings.left_stroke) == 0:
-            #     bpy.context.window_manager.popup_menu(
-            #         GC_OT_incomplete_branch_shape_popup.draw,
-            #         title=GC_OT_incomplete_branch_shape_popup.bl_label,
-            #         icon='INFO'
-            #     )
-            #     return False
+            if active_tool == 'BRANCH' and (len(bshape_canvas_settings.left_stroke) > 0 and len(bshape_canvas_settings.right_stroke) == 0):
+                bpy.context.window_manager.popup_menu(
+                    GC_OT_incomplete_branch_shape_popup.draw,
+                    title=GC_OT_incomplete_branch_shape_popup.bl_label,
+                    icon='INFO'
+                )
+                return False
 
             if active_tool == 'LEAF':
                 if len(bpy.context.scene.leaf_curvature_type_canvas_settings.stroke) == 0:
