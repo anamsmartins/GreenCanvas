@@ -32,20 +32,20 @@ https://github.com/user-attachments/assets/b30b38af-6766-4238-9c02-72395107cdd8
 4. Click **Buid Plant** to convert your sketch into a 3D model.
 5. Use the additional provided features, such as adjusting the Level of Detail (LoD), propagate leaves along the branches, and generate variations of the model, and/or edit your model like any other Blender object.
 
-## ⚙️ Installation
-
-You can install GreenCanvas by downloading the addon zip for your operating system:
+## 📦 Downloads
 
 - **Windows**
-  - [GreenCanvas-windows-x64.zip](link_to_release)
-  - [GreenCanvas-windows-amd64.zip](link_to_release)
+  - [GreenCanvas-1.0.0-windows-x64.zip](https://github.com/anamsmartins/GreenCanvas/releases/download/v1.0.0/greencanvas-1.0.0-windows_x64.zip)
+  - [GreenCanvas-1.0.0-win-amd64.zip](https://github.com/anamsmartins/GreenCanvas/releases/download/v1.0.0/greencanvas-1.0.0-win_amd64.zip)
 
 - **macOS**
-  - [GreenCanvas-macos-x64.zip](link_to_release)
-  - [GreenCanvas-macos-arm64.zip](link_to_release)
+  - [GreenCanvas-1.0.0-macos-x64.zip](https://github.com/anamsmartins/GreenCanvas/releases/download/v1.0.0/greencanvas-1.0.0-macos_x64.zip)
+  - [GreenCanvas-1.0.0-macos-arm64.zip](https://github.com/anamsmartins/GreenCanvas/releases/download/v1.0.0/greencanvas-1.0.0-macos_arm64.zip)
 
 - **Linux**
-  - [GreenCanvas-linux-x64.zip](link_to_release)
+  - [GreenCanvas-1.0.0-linux-x64.zip](https://github.com/anamsmartins/GreenCanvas/releases/download/v1.0.0/greencanvas-1.0.0-linux_x64.zip)
+
+## ⚙️ Installation
 
 ### Installing in Blender
 1. In Blender, go to **Edit > Preferences > Add-ons > Install**.
@@ -55,7 +55,6 @@ You can install GreenCanvas by downloading the addon zip for your operating syst
 ### Using Jacques Lucke's Blender Development VSCode Extension
 1. Uncomment and adapt sections with "Comment when building zip" text in __init__.py file
 2. Run "Blender: Start" with the extension
-
 
 ### Wheels (Dependencies)
 
