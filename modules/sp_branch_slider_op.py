@@ -9,6 +9,9 @@ from .bl_panel_active_tool import is_branch_panel_active
 PANEL_BOUNDS = {"x": 15, "y": 155, "width": 170, "height": 50}
 SLIDER_BOUNDS = {"x": 5, "y": 20, "width": PANEL_BOUNDS["width"] - 10, "height": PANEL_BOUNDS["height"] - 20}
 
+def clear_widgets_locals():
+    return bpy.context.scene.built_plant
+
 class DP_OT_draw_branch_slider_operator(BL_UI_OT_draw_operator):
     bl_idname = "view3d.dp_ot_draw_branch_slider_operator"
     bl_label = "Blender UI branch slider operator"
@@ -17,11 +20,12 @@ class DP_OT_draw_branch_slider_operator(BL_UI_OT_draw_operator):
 
     def on_invoke(self, context, event):
         self.region_type = "UI"
+        self.is_operator_active = is_branch_panel_active
+        self.clear_widgets_locals = clear_widgets_locals
             
         self.panel = BL_UI_Static_Panel(PANEL_BOUNDS["x"], PANEL_BOUNDS["y"], PANEL_BOUNDS["width"], PANEL_BOUNDS["height"])
         self.panel.region_type = self.region_type
         self.panel.bg_color = (0, 0, 0, 0)
-        self.panel.is_widget_active = is_branch_panel_active
 
         self.slider = BL_UI_Slider(SLIDER_BOUNDS["x"], SLIDER_BOUNDS["y"], SLIDER_BOUNDS["width"], SLIDER_BOUNDS["height"])
         self.slider.color= (0.69, 0.937, 0.69, 0.8)
@@ -34,7 +38,6 @@ class DP_OT_draw_branch_slider_operator(BL_UI_OT_draw_operator):
         self.slider.set_value_change(self.on_slider_value_change)
 
         self.slider.region_type = self.region_type
-        self.slider.is_widget_active = is_branch_panel_active
 
         # Add new widgets here
         widgets_panel = [self.slider]
@@ -55,11 +58,12 @@ classes = (
 
 def register():
     for cls in classes:
-        if not hasattr(bpy.types, cls.__name__):
-            bpy.utils.register_class(cls)
+        bpy.utils.register_class(cls)
 
 def unregister():  
     for cls in reversed(classes):
-        if hasattr(bpy.types, cls.__name__):
+        try:
             bpy.utils.unregister_class(cls)
+        except RuntimeError:
+            pass
 

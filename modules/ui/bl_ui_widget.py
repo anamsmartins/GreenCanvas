@@ -336,3 +336,6 @@ class BL_UI_Widget:
 
     def redo(self):
         pass
+
+    def clear_locals(self):
+        pass

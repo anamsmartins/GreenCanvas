@@ -338,9 +338,12 @@ class BL_UI_Slider(BL_UI_Widget):
                 pass
                  
     def mouse_down(self, x, y):
+        if not (self._is_visible and self.is_widget_active):
+            return False
+
         self.update_x_offset()
 
-        if self._is_visible and self.is_widget_active and self.is_in_rect(x,y):
+        if self.is_in_rect(x,y):
             try:
                 is_valid = self.on_mouse_down_popup()
                 if not is_valid:

@@ -11,19 +11,21 @@ CANVAS_BOUNDS = {"x": 0, "y": HEADER_BOUNDS["height"], "width": PANEL_BOUNDS["wi
 
 main_canvas = None
 
+def is_main_canvas_active():
+    return bpy.context.scene.main_canvas_visible
+
+def clear_widgets_locals():
+    return bpy.context.scene.built_plant
+
 class DP_OT_draw_main_canvas_operator(BL_UI_OT_draw_operator):
     bl_idname = "view3d.dp_ot_draw_main_canvas_operator"
     bl_label = "Blender UI main canvas operator"
     bl_description = "Main drawing canvas operator, where the user draws the plant sketch (branches & leaves)" 
     bl_options = {'REGISTER'}
 
-    # Draw handler to paint onto the screen
-    def draw_callback_px(self, op, context):
-        if bpy.context.scene.main_canvas_visible:
-            for widget in self.widgets:
-                widget.draw()
-
     def on_invoke(self, context, event):
+        self.is_operator_active = is_main_canvas_active
+        self.clear_widgets_locals = clear_widgets_locals
 
         self.panel = BL_UI_Drag_Panel(PANEL_BOUNDS["x"], PANEL_BOUNDS["y"], PANEL_BOUNDS["width"], PANEL_BOUNDS["height"])
         self.panel.bg_color = (0.921, 0.984, 0.933, 0.2)
@@ -33,7 +35,7 @@ class DP_OT_draw_main_canvas_operator(BL_UI_OT_draw_operator):
         self.header.bg_color = (0.264, 0.264, 0.264, 1)
 
         self.canvas = BL_UI_Main_Canvas(CANVAS_BOUNDS["x"], CANVAS_BOUNDS["y"], CANVAS_BOUNDS["width"], CANVAS_BOUNDS["height"])
-        
+
         global main_canvas 
         main_canvas = self.canvas
 
@@ -99,10 +101,11 @@ classes = (
         
 def register():
     for cls in classes:
-        if not hasattr(bpy.types, cls.__name__):
-            bpy.utils.register_class(cls)
+        bpy.utils.register_class(cls)
 
 def unregister():  
     for cls in reversed(classes):
-        if hasattr(bpy.types, cls.__name__):
+        try:
             bpy.utils.unregister_class(cls)
+        except RuntimeError:
+            pass

@@ -118,8 +118,7 @@ classes = (
         
 def register():
     for cls in classes:
-        if not hasattr(bpy.types, cls.__name__):
-            bpy.utils.register_class(cls)
+        bpy.utils.register_class(cls)
 
     bpy.types.Scene.panel_settings = bpy.props.PointerProperty(type=GC_PG_panel_settings)
     bpy.types.Scene.branch_collection = bpy.props.PointerProperty(type=GC_PG_BranchCollection)
@@ -152,6 +151,26 @@ def register():
 
 
 def unregister():  
+    bpy.context.scene.panel_settings.active_tool = 'BRANCH'
+    bpy.context.scene.branch_collection.branches.clear()
+    bpy.context.scene.leaf_collection.leaves.clear()
+    bpy.context.scene.branch_shape_canvas_settings.left_stroke.clear()
+    bpy.context.scene.branch_shape_canvas_settings.right_stroke.clear()
+    bpy.context.scene.branch_slider_settings.brush_size = 4
+    bpy.context.scene.leaf_curvature_type_canvas_settings.stroke.clear()
+
+    for op in getattr(bpy.context.scene, "draw_operators", []):
+        try:
+            op.finish()
+        except ReferenceError:
+            pass
+    bpy.context.scene.draw_operators.clear()
+
+    bpy.context.scene.started_drawing = False
+    bpy.context.scene.main_canvas_visible = False
+    bpy.context.scene.built_plant = False 
+    bpy.context.scene.ignore_brush_size = False
+
     del bpy.types.Scene.panel_settings
     del bpy.types.Scene.branch_collection
     del bpy.types.Scene.leaf_collection
@@ -166,7 +185,9 @@ def unregister():
     del bpy.types.Scene.model_type_selector
     del bpy.types.Scene.propagate_leaves_selector
     del bpy.types.Scene.ignore_brush_size
-
+    
     for cls in reversed(classes):
-        if hasattr(bpy.types, cls.__name__):
+        try:
             bpy.utils.unregister_class(cls)
+        except RuntimeError:
+            pass

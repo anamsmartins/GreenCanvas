@@ -25,12 +25,12 @@ class BL_UI_Branch_Panel_Canvas(BL_UI_Panel_Canvas):
         return False
 
     def mouse_move(self, x, y):
-        if self.is_drawing and self.is_in_rect(x, y):
+        if self.is_widget_active and self.is_drawing and self.is_in_rect(x, y):
             if len(self.branches) > 0:
                 self.branches[-1].append((x - self.x_offset, y))
 
     def mouse_up(self, x, y):
-        if self.is_drawing:
+        if self.is_widget_active and self.is_drawing:
             self.is_drawing = False
             
             if len(self.branches) == 0:
@@ -137,7 +137,7 @@ class BL_UI_Branch_Panel_Canvas(BL_UI_Panel_Canvas):
 
 
     def draw(self):
-        if not self.is_widget_active:
+        if not self.is_widget_active or not self.is_widget_active:
             return
 
         for branch in self.branches:
@@ -161,3 +161,6 @@ class BL_UI_Branch_Panel_Canvas(BL_UI_Panel_Canvas):
         X = x / src_w * tgt_w
         Y = y / src_h * tgt_h
         return (X, Y)
+    
+    def clear_locals(self):
+        self.branches.clear()

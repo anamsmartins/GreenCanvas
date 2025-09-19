@@ -1,6 +1,6 @@
 import bpy
 import random
-from mathutils import Matrix
+from mathutils import Matrix, Vector
 import bmesh
 import math
 
@@ -13,29 +13,54 @@ def find_edge_chain(obj):
     bm.verts.ensure_lookup_table()
     bm.edges.ensure_lookup_table()
 
-    # Find endpoints (open branch will have two, spiral or straight)
+    # Try to find an open chain first (works for curve-converted meshes)
     endpoints = [v for v in bm.verts if len(v.link_edges) == 1]
-    if not endpoints:
-        start = bm.verts[0]
-    else:
+    if endpoints:
         start = endpoints[0]
+        chain = [start]
+        visited = {start}
+        current = start
 
-    chain = [start]
-    visited = {start}
-    current = start
+        while True:
+            nexts = [e.other_vert(current) for e in current.link_edges if e.other_vert(current) not in visited]
+            if not nexts:
+                break
+            current = nexts[0]
+            chain.append(current)
+            visited.add(current)
 
-    while True:
-        nexts = [e.other_vert(current) for e in current.link_edges if e.other_vert(current) not in visited]
-        if not nexts:
-            break
-        current = nexts[0]
-        chain.append(current)
-        visited.add(current)
-    
-    coords_chain = [v.co for v in chain]
+        coords_chain = [v.co for v in chain]
+        bm.free()
+        return coords_chain
+
+    # Fallback: branch-shape mesh (closed tube). Approximate spine.
+    verts = [v.co for v in bm.verts]
     bm.free()
-    
+
+    # Find main axis by bounding box (tallest dimension)
+    min_co = Vector((min(v.x for v in verts),
+                               min(v.y for v in verts),
+                               min(v.z for v in verts)))
+    max_co = Vector((max(v.x for v in verts),
+                               max(v.y for v in verts),
+                               max(v.z for v in verts)))
+    axis = (max_co - min_co)
+    axis_dim = max(range(3), key=lambda i: abs(axis[i]))
+
+    # Slice mesh along axis into N bins and compute centroids
+    steps = 20
+    min_val, max_val = min(v[axis_dim] for v in verts), max(v[axis_dim] for v in verts)
+    step_size = (max_val - min_val) / (steps - 1)
+    coords_chain = []
+    for i in range(steps):
+        val = min_val + i * step_size
+        ring = [v for v in verts if abs(v[axis_dim] - val) < step_size * 0.5]
+        if ring:
+            centroid = sum(ring, Vector()) / len(ring)
+            coords_chain.append(centroid)
+
     return coords_chain
+
 
 def point_at_offset(chain_world, offset):
     acc = 0
@@ -233,13 +258,14 @@ classes = (
 
 def register():
     for cls in classes:
-        if not hasattr(bpy.types, cls.__name__):
-            bpy.utils.register_class(cls)
+        bpy.utils.register_class(cls)
 
 def unregister():
     for cls in reversed(classes):
-        if hasattr(bpy.types, cls.__name__):
+        try:
             bpy.utils.unregister_class(cls)
+        except RuntimeError:
+            pass
    
     
         

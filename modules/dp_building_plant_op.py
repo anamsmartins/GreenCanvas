@@ -43,10 +43,11 @@ classes = (
         
 def register():
     for cls in classes:
-        if not hasattr(bpy.types, cls.__name__):
-            bpy.utils.register_class(cls)
+        bpy.utils.register_class(cls)
 
 def unregister():  
     for cls in reversed(classes):
-        if hasattr(bpy.types, cls.__name__):
+        try:
             bpy.utils.unregister_class(cls)
+        except RuntimeError:
+            pass

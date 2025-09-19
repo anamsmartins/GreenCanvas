@@ -1,7 +1,10 @@
 import bpy
 
 from .bl_panel_active_tool import set_branch_panel_active
-
+from .dp_main_canvas_op import register as dp_main_canvas_op_register
+from .sp_branch_slider_op import register as sp_branch_slider_op_register
+from .sp_branch_shape_canvas_op import register as sp_branch_shape_canvas_op_register
+from .sp_leaf_curvature_type_canvas_op import register as sp_leaf_curvature_type_canvas_op_register
 
 class GC_PT_actions_panel(bpy.types.Panel):
     bl_idname = "GC_PT_actions_panel"
@@ -62,12 +65,14 @@ class GC_OT_start_drawing_operator(bpy.types.Operator):
         bpy.context.scene.panel_settings.active_tool = "BRANCH"
         bpy.context.scene.started_drawing = True
         bpy.context.scene.main_canvas_visible = True
+        bpy.context.scene.built_plant = False
         set_branch_panel_active(True)
 
         bpy.ops.view3d.dp_ot_draw_main_canvas_operator('INVOKE_DEFAULT') # open main drawing canvas
         bpy.ops.view3d.dp_ot_draw_branch_slider_operator('INVOKE_DEFAULT') # open branch slider
         bpy.ops.view3d.dp_ot_draw_branch_shape_canvas_operator('INVOKE_DEFAULT') # open branch shape canvas
         bpy.ops.view3d.dp_ot_draw_leaf_curvature_type_canvas_operator('INVOKE_DEFAULT') # open leaf curvature type canvas
+        bpy.ops.view3d.dp_ot_draw_lod_slider_operator("INVOKE_DEFAULT") # open lod slider
 
         return {'FINISHED'}
 
@@ -78,15 +83,10 @@ class GC_OT_start_drawing_additional_operator(bpy.types.Operator):
     bl_options = {'REGISTER'}
 
     def execute(self, context):
-        context.scene.panel_settings.active_tool = "BRANCH"
-
+        bpy.context.scene.panel_settings.active_tool = "BRANCH"
         bpy.context.scene.built_plant = False
+        bpy.context.scene.main_canvas_visible = True
         set_branch_panel_active(True)
-
-        bpy.ops.view3d.dp_ot_draw_main_canvas_operator('INVOKE_DEFAULT') # open main drawing canvas
-        bpy.ops.view3d.dp_ot_draw_branch_slider_operator('INVOKE_DEFAULT') # open branch slider
-        bpy.ops.view3d.dp_ot_draw_branch_shape_canvas_operator('INVOKE_DEFAULT') # open branch shape canvas
-        bpy.ops.view3d.dp_ot_draw_leaf_curvature_type_canvas_operator('INVOKE_DEFAULT') # open leaf curvature type canvas
         self.clear_previous_plant_variables()
 
         return {'FINISHED'}     
@@ -111,13 +111,14 @@ classes = (
 
 def register():
     for cls in classes:
-        if not hasattr(bpy.types, cls.__name__):
-            bpy.utils.register_class(cls)
+        bpy.utils.register_class(cls)
 
 def unregister():    
     for cls in reversed(classes):
-        if hasattr(bpy.types, cls.__name__):
+        try:
             bpy.utils.unregister_class(cls)
+        except RuntimeError:
+            pass
 
 
     

@@ -94,40 +94,17 @@ class GC_OT_build_plant(bpy.types.Operator):
         build_plant_mesh(branches)
 
         if not variations:
-            self.remove_extra_UI_components()
-            self.invoke_lod_slider()
-        else:
+            bpy.context.scene.main_canvas_visible = False
 
-            for op in getattr(bpy.context.scene, "draw_operators", []):
-                try:
-                    if op.bl_idname == "VIEW3D_OT_dp_ot_building_plant_operator":
-                        op._finished = True
-                except ReferenceError:
-                    pass
-
-        return None
-
-    def remove_extra_UI_components(self):
+        # Hide building plant panel
         for op in getattr(bpy.context.scene, "draw_operators", []):
             try:
-                op._finished = True
+                if op.bl_idname == "VIEW3D_OT_dp_ot_building_plant_operator":
+                    op._finished = True
             except ReferenceError:
                 pass
 
-        sp_branch_shape_canvas_op_unregister()
-        sp_leaf_curvature_type_canvas_op_unregister()
-        sp_branch_slider_op_unregister()
-        dp_main_canvas_op_unregister()
-        sp_branch_slider_op_unregister()
-
-    def invoke_lod_slider(self):
-        ctx = self.get_view3d_context()
-        if bpy.app.version[0] < 4:
-            bpy.ops.view3d.dp_ot_draw_lod_slider_operator(ctx, "INVOKE_DEFAULT")
-        else:
-            with bpy.context.temp_override(**ctx):
-                bpy.ops.view3d.dp_ot_draw_lod_slider_operator("INVOKE_DEFAULT")
-
+        return None
 
     def sample_near_center(self, x_range, y_range, fraction=0.05):
         x_center = (x_range[0] + x_range[1]) / 2
@@ -138,21 +115,21 @@ class GC_OT_build_plant(bpy.types.Operator):
         y_random = np.random.uniform(y_center - y_half_height, y_center + y_half_height)
         return x_random, y_random
 
-    def get_view3d_context(self):
-        for window in bpy.context.window_manager.windows:
-            for area in window.screen.areas:
-                if area.type == "VIEW_3D":
-                    for region in area.regions:
-                        if region.type == 'WINDOW':
-                            override = {
-                                "window": window,
-                                "screen": window.screen,
-                                "area": area,
-                                "region": region,
-                                "scene": bpy.context.scene,
-                            }
-                            return override
-        return None
+def get_view3d_context():
+    for window in bpy.context.window_manager.windows:
+        for area in window.screen.areas:
+            if area.type == "VIEW_3D":
+                for region in area.regions:
+                    if region.type == 'WINDOW':
+                        override = {
+                            "window": window,
+                            "screen": window.screen,
+                            "area": area,
+                            "region": region,
+                            "scene": bpy.context.scene,
+                        }
+                        return override
+    return None
 
 classes = (GC_OT_build_plant,)
 

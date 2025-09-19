@@ -177,8 +177,7 @@ classes = (
 
 def register():
     for cls in classes:
-        if not hasattr(bpy.types, cls.__name__):
-            bpy.utils.register_class(cls)
+        bpy.utils.register_class(cls)
     try:
         bpy.app.timers.register(check_active_tool_panel_status, persistent=True)
     except ValueError:
@@ -186,8 +185,10 @@ def register():
 
 def unregister():    
     for cls in reversed(classes):
-        if hasattr(bpy.types, cls.__name__):
+        try:
             bpy.utils.unregister_class(cls)
+        except RuntimeError:
+            pass
 
     try:
         bpy.app.timers.unregister(check_active_tool_panel_status)

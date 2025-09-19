@@ -64,7 +64,7 @@ class BL_UI_Main_Canvas(BL_UI_Widget):
         super().update(x, y)
 
     def mouse_down(self, x, y):        
-        if self.is_in_rect(x,y):
+        if self.is_widget_active and self.is_in_rect(x,y):
             if not self._is_visible:
                 return
             
@@ -105,14 +105,14 @@ class BL_UI_Main_Canvas(BL_UI_Widget):
         return False
 
     def mouse_move(self, x, y):
-        if self.is_drawing and self.is_in_rect(x,y):
+        if self.is_widget_active and self.is_drawing and self.is_in_rect(x,y):
             if not self._is_visible:
                 return
             
             self.current_stroke.append((x, y))
 
     def mouse_up(self, x, y):
-        if not self._is_visible:
+        if not self._is_visible or not self.is_widget_active:
             return
         
         if len(self.current_stroke) >= 4:
@@ -205,7 +205,7 @@ class BL_UI_Main_Canvas(BL_UI_Widget):
         self.current_stroke = []
 
     def draw(self):
-        if not self._is_visible:
+        if not self._is_visible or not self.is_widget_active:
             return 
         
         # Draw all finished branch strokes
@@ -288,20 +288,25 @@ class BL_UI_Main_Canvas(BL_UI_Widget):
                     )
                 return
             
-            self.branches.clear()
             bpy.context.scene.branch_collection.branches.clear()
-            self.undo_branches_stack.clear()
+            self.clear_local_branches()
         
         elif active_tool == "LEAF" and (self.leaves or self.current_leaf):
-            self.leaves.clear()
             bpy.context.scene.leaf_collection.leaves.clear()
-            self.undo_leaves_stack.clear()
-
-            self.current_leaf.clear()
-            self.current_leaf_tips.clear()
-            self.undo_current_leaf_stack.clear()
+            self.clear_local_leaves()
         
         self.context.area.tag_redraw()
+
+    def clear_local_branches(self):
+        self.branches.clear()
+        self.undo_branches_stack.clear()
+
+    def clear_local_leaves(self):
+        self.leaves.clear()
+        self.undo_leaves_stack.clear()
+        self.current_leaf.clear()
+        self.current_leaf_tips.clear()
+        self.undo_current_leaf_stack.clear()
 
     def add_gp_points_to_stroke(self, gp_stroke, stroke):
         for x, y in stroke:
@@ -364,3 +369,6 @@ class BL_UI_Main_Canvas(BL_UI_Widget):
         if len(leaves) > 0:
             leaves.remove(len(leaves) - 1)
             
+    def clear_locals(self):
+        self.clear_local_branches()
+        self.clear_local_leaves()

@@ -2,19 +2,19 @@ import bpy
 import time
 
 last_draw_time = 0
-draw_active = False
+properties_draw_active = False
 
 def is_properties_panel_active():
-    global draw_active
-    return draw_active
+    global properties_draw_active
+    return properties_draw_active
 
 def check_properties_panel_status():
-    global last_draw_time, draw_active
+    global last_draw_time, properties_draw_active
 
     now = time.time()
     # If draw was active but hasn't been called for >1 second
-    if draw_active and (now - last_draw_time) > 0.15:
-        draw_active = False
+    if properties_draw_active and (now - last_draw_time) > 0.15:
+        properties_draw_active = False
 
     return 0.1
 
@@ -30,9 +30,9 @@ class GC_PT_properties_panel(bpy.types.Panel):
         return bpy.context.scene.built_plant
 
     def draw(self, context):
-        global last_draw_time, draw_active
+        global last_draw_time, properties_draw_active
         last_draw_time = time.time()
-        draw_active = True
+        properties_draw_active = True
 
         layout = self.layout
         layout.scale_y = 1.4
@@ -66,8 +66,7 @@ classes = (
 
 def register():
     for cls in classes:
-        if not hasattr(bpy.types, cls.__name__):
-            bpy.utils.register_class(cls)
+        bpy.utils.register_class(cls)
 
     try:
         bpy.app.timers.register(check_properties_panel_status, persistent=True)
@@ -77,8 +76,10 @@ def register():
 
 def unregister():    
     for cls in reversed(classes):
-        if hasattr(bpy.types, cls.__name__):
+        try:
             bpy.utils.unregister_class(cls)
+        except RuntimeError:
+            pass
     
     try:
         bpy.app.timers.unregister(check_properties_panel_status)

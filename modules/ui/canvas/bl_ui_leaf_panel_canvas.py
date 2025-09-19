@@ -81,3 +81,6 @@ class BL_UI_Leaf_Panel_Canvas(BL_UI_Panel_Canvas):
         self.curvature_type.clear()
         bpy.context.scene.leaf_curvature_type_canvas_settings.stroke.clear()
         self.context.area.tag_redraw()
+
+    def clear_locals(self):
+        self.curvature_type.clear()

@@ -9,6 +9,8 @@ class BL_UI_OT_draw_operator(Operator):
     bl_options = {'REGISTER'}
     	
     finish_callback = None
+    _is_operator_active = None
+    _clear_widgets_locals = None
 
     @property
     def region_type(self):
@@ -18,6 +20,23 @@ class BL_UI_OT_draw_operator(Operator):
     def region_type(self, value):
         if value in ["WINDOW", "UI"]:
             self._region_type  = value
+
+    @property
+    def is_operator_active(self):
+        return self._is_operator_active() if self._is_operator_active else True
+
+    @is_operator_active.setter
+    def is_operator_active(self, function):
+        self._is_operator_active = function
+
+    @property
+    def clear_widgets_locals(self):
+        return self._clear_widgets_locals() if self._clear_widgets_locals else True
+
+    @clear_widgets_locals.setter
+    def clear_widgets_locals(self, function):
+        self._clear_widgets_locals = function
+
 
     def init_widgets(self, context, widgets):
         self.widgets = widgets
@@ -66,6 +85,9 @@ class BL_UI_OT_draw_operator(Operator):
         self.draw_event  = None
         
     def handle_widget_events(self, event):
+        if not self.is_operator_active:
+            return False
+        
         result = False
         for widget in self.widgets:
             if widget.handle_event(event):
@@ -80,6 +102,9 @@ class BL_UI_OT_draw_operator(Operator):
 
         if context.area:
             context.area.tag_redraw()
+
+        if self.clear_widgets_locals:
+            self.clear_widget_locals_callback()
         
         if self.handle_widget_events(event):
             return {'RUNNING_MODAL'}   
@@ -92,5 +117,10 @@ class BL_UI_OT_draw_operator(Operator):
 		
 	# Draw handler to paint onto the screen
     def draw_callback_px(self, op, context):
+        if self.is_operator_active:
+            for widget in self.widgets:
+                widget.draw()
+
+    def clear_widget_locals_callback(self):
         for widget in self.widgets:
-            widget.draw()
+            widget.clear_locals()
