@@ -34,14 +34,27 @@ https://github.com/user-attachments/assets/b30b38af-6766-4238-9c02-72395107cdd8
 
 ## ⚙️ Installation
 
-From Source
-1. Download the .zip of the corresponding operative system.
-2. In Blender, go to Edit > Preferences > Add-ons > Install and select the .zip.
+You can install GreenCanvas by downloading the addon zip for your operating system:
+
+- **Windows**
+  - [GreenCanvas-windows-x64.zip](link_to_release)
+  - [GreenCanvas-windows-amd64.zip](link_to_release)
+
+- **macOS**
+  - [GreenCanvas-macos-x64.zip](link_to_release)
+  - [GreenCanvas-macos-arm64.zip](link_to_release)
+
+- **Linux**
+  - [GreenCanvas-linux-x64.zip](link_to_release)
+
+### Installing in Blender
+1. In Blender, go to **Edit > Preferences > Add-ons > Install**.
+2. Select the downloaded `.zip` file for your OS.
 3. Enable the addon in the list.
 
-From Jacques Lucke's Blender Development VSCode Extension
-1. Uncomment and adapt sections with "Remove when deploy" text in __init__.py file
-2. Run Blender Start with the extension
+### Using Jacques Lucke's Blender Development VSCode Extension
+1. Uncomment and adapt sections with "Comment when building zip" text in __init__.py file
+2. Run "Blender: Start" with the extension
 
 
 ### Wheels (Dependencies)
