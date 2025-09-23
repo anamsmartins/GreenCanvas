@@ -6,7 +6,7 @@ from .ui.panels.bl_ui_static_panel import *
 
 from .bl_panel_active_tool import is_branch_panel_active
 
-PANEL_BOUNDS = {"x": 15, "y": 155, "width": 170, "height": 50}
+PANEL_BOUNDS = {"x": 15, "y": 110, "width": 170, "height": 50}
 SLIDER_BOUNDS = {"x": 5, "y": 20, "width": PANEL_BOUNDS["width"] - 10, "height": PANEL_BOUNDS["height"] - 20}
 
 def clear_widgets_locals():

@@ -259,10 +259,7 @@ class BL_UI_Slider(BL_UI_Widget):
         if new_slider_width == self.__slider_width:
             return
 
-        height_factor = 7.5 if bpy.app.version[0] < 4 else 24.5
-
         self.__slider_width = new_slider_width
-        self.__slider_height = int(self.base_slider_height + ((self.base_slider_height - (((self.base_slider_height * region_h) / self.base_region_height))) * height_factor))
         self._text_size = int(self.base_text_size * bpy.context.preferences.view.ui_scale)
         self.__slider_pos = self.__value_to_pos(self.__slider_value)
  

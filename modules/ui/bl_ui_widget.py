@@ -178,17 +178,19 @@ class BL_UI_Widget:
 
     def update_to_ui_scale(self):
         region_w = self.get_region_width(self.region_type)
-        region_h = self.get_region_height(self.region_type)
 
         new_width = int((self.base_width  * region_w) / (self.base_region_width))
-        if self.width == new_width:
-            return
 
-        height_factor = 7.5 if bpy.app.version[0] < 4 else 24.5
         self.width  = new_width
-        self.height  =  int(self.base_height + ((self.base_height - (((self.base_height * region_h) / self.base_region_height))) * height_factor))
+        
+        height_factor = ((self.base_height * 100) / self.base_width) / 100
+        self.height  = int(self.width * height_factor)
+        
         new_x = int((self.base_x  * region_w) / (self.base_region_width))
-        new_y = int(self.base_y + ((self.base_y - (((self.base_y * region_h) / self.base_region_height))) * height_factor))
+        
+        y_factor = ((self.base_y * 100) / max(self.base_x, 0.01)) / 100
+        new_y = int(self.x * y_factor)
+
         self.set_location(new_x, new_y)
 
     def init(self, context):
@@ -258,7 +260,7 @@ class BL_UI_Widget:
 
         return False 
 
-    def get_input_keys(self)                :
+    def get_input_keys(self):
         return []
 
     def get_area_height(self):
