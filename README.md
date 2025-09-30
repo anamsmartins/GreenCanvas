@@ -35,15 +35,15 @@ https://github.com/user-attachments/assets/b30b38af-6766-4238-9c02-72395107cdd8
 ## 📦 Downloads
 
 - **Windows**
-  - [GreenCanvas-1.0.0-windows-x64.zip](https://github.com/anamsmartins/GreenCanvas/releases/download/v1.0.1/greencanvas-1.0.0-windows_x64.zip)
-  - [GreenCanvas-1.0.0-win-amd64.zip](https://github.com/anamsmartins/GreenCanvas/releases/download/v1.0.1/greencanvas-1.0.0-win_amd64.zip)
+  - [GreenCanvas-1.0.2-windows-x64.zip](https://github.com/anamsmartins/GreenCanvas/releases/download/v1.0.2/greencanvas-1.0.2-windows_x64.zip)
+  - [GreenCanvas-1.0.2-win-amd64.zip](https://github.com/anamsmartins/GreenCanvas/releases/download/v1.0.2/greencanvas-1.0.2-win_amd64.zip)
 
 - **macOS**
-  - [GreenCanvas-1.0.0-macos-x64.zip](https://github.com/anamsmartins/GreenCanvas/releases/download/v1.0.1/greencanvas-1.0.0-macos_x64.zip)
-  - [GreenCanvas-1.0.0-macos-arm64.zip](https://github.com/anamsmartins/GreenCanvas/releases/download/v1.0.1/greencanvas-1.0.0-macos_arm64.zip)
+  - [GreenCanvas-1.0.2-macos-x64.zip](https://github.com/anamsmartins/GreenCanvas/releases/download/v1.0.2/greencanvas-1.0.2-macos_x64.zip)
+  - [GreenCanvas-1.0.2-macos-arm64.zip](https://github.com/anamsmartins/GreenCanvas/releases/download/v1.0.2/greencanvas-1.0.2-macos_arm64.zip)
 
 - **Linux**
-  - [GreenCanvas-1.0.0-linux-x64.zip](https://github.com/anamsmartins/GreenCanvas/releases/download/v1.0.1/greencanvas-1.0.0-linux_x64.zip)
+  - [GreenCanvas-1.0.2-linux-x64.zip](https://github.com/anamsmartins/GreenCanvas/releases/download/v1.0.2/greencanvas-1.0.2-linux_x64.zip)
 
 ## ⚙️ Installation
 
