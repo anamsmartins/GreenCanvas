@@ -28,7 +28,8 @@ class BL_UI_Widget:
         self.base_y = self.y
         self.base_width = self.width
         self.base_height = self.height
-
+        self.last_height = self.height
+        
     def set_location(self, x, y):
         self.x = x
         self.y = y
@@ -178,18 +179,24 @@ class BL_UI_Widget:
 
     def update_to_ui_scale(self):
         region_w = self.get_region_width(self.region_type)
+        region_h = self.get_region_height(self.region_type)
 
         new_width = int((self.base_width  * region_w) / (self.base_region_width))
-
         self.width  = new_width
+
+        new_x = int((self.base_x  * region_w) / (self.base_region_width))
+
+        if region_h == self.last_height:
+            self.set_location(new_x, self.y)
+            return
+        
+        self.last_height = region_h
         
         height_factor = ((self.base_height * 100) / self.base_width) / 100
         self.height  = int(self.width * height_factor)
-        
-        new_x = int((self.base_x  * region_w) / (self.base_region_width))
-        
+
         y_factor = ((self.base_y * 100) / max(self.base_x, 0.01)) / 100
-        new_y = int(self.x * y_factor)
+        new_y = int(new_x * y_factor)
 
         self.set_location(new_x, new_y)
 
@@ -206,7 +213,7 @@ class BL_UI_Widget:
         self.update_x_offset()
 
         self.update(self.x, self.y)
-    
+
     def update(self, x, y):
 
         self.x_screen = x

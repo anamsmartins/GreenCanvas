@@ -6,7 +6,11 @@ from .ui.panels.bl_ui_static_panel import *
 from ..modules.bl_panel_properties import is_properties_panel_active
 from ..modules.popups import GC_OT_no_object_selected_popup
 
-PANEL_BOUNDS = {"x": 15, "y": 75, "width": 170, "height": 50}
+if bpy.app.version[0] < 4:
+    PANEL_BOUNDS = {"x": 15, "y": 110, "width": 170, "height": 50}
+else:
+    PANEL_BOUNDS = {"x": 15, "y": 75, "width": 170, "height": 50}
+
 SLIDER_BOUNDS = {"x": 5, "y": 20, "width": PANEL_BOUNDS["width"] - 10, "height": PANEL_BOUNDS["height"] - 20}
 
 def clear_widgets_locals():

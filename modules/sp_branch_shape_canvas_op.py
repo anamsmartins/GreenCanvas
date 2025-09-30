@@ -8,7 +8,10 @@ from .ui.components.bl_ui_button import *
 
 from .bl_panel_active_tool import is_branch_panel_active
 
-PANEL_BOUNDS = {"x": 20, "y": 185, "width": 160, "height": 60}
+if bpy.app.version[0] < 4:
+    PANEL_BOUNDS = {"x": 20, "y": 245, "width": 160, "height": 65}
+else:
+    PANEL_BOUNDS = {"x": 20, "y": 180, "width": 160, "height": 60}
 
 def clear_widgets_locals():
     return bpy.context.scene.built_plant

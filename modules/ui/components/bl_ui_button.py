@@ -82,7 +82,6 @@ class BL_UI_Button(BL_UI_Widget):
     def update(self, x, y):        
         super().update(x, y)
         self._textpos = [x, y]
-        self.draw_image()   
 
     def update_to_ui_scale(self):
         super().update_to_ui_scale()
