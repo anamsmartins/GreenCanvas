@@ -72,5 +72,21 @@ Due to the lack of custom UI widgets in Blender, the custom UI elements presente
 
 ### Research Background
 
-A systematic review of plant modeling techniques was conducted to inform the design and implementation of GreenCanvas. This ensures the generated models are grounded in both creative workflows and botanical accuracy.
+- A systematic review of plant modelling techniques was conducted to inform the design and implementation of GreenCanvas. This ensures the generated models are grounded in both creative workflows and botanical accuracy.
+- An article outlining the project framework was published as a [conference paper](https://ieeexplore.ieee.org/document/11302684) at [ICGI 2025](https://gpcg.pt/icgi2025/).
+  
+## Other Information
 
+<ul>
+  <li><strong>The project received a grade of 19 out of 20.</strong></li>
+  <li>This project was developed as part of the <strong>Dissertation</strong> for the <a href="https://www.ipleiria.pt/curso/mestrado-em-engenharia-informatica-computacao-movel/" rel="nofollow">Computer Engineering (Mobile Computing) master's degree</a> at <a href="https://www.ipleiria.pt" rel="nofollow">Polytechnic of Leiria</a> during the 2024/25 academic year.</li>
+</ul>
+
+<p>
+<a href="https://www.ipleiria.pt/estg/" rel="nofollow">
+<img src="https://www.ipleiria.pt/normasgraficas/wp-content/uploads/sites/80/2017/09/estg_h-01.jpg"
+     width="300"
+     alt="Escola Superior de Tecnologia e Gestão"
+     style="max-width: 100%;">
+</a>
+</p>
